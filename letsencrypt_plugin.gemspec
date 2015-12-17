@@ -18,6 +18,5 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", "~> 4.2.5"
   s.add_dependency "acme-client"
-  s.add_dependency "sqlite3"
   s.add_development_dependency "minitest"
 end
