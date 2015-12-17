@@ -3,28 +3,29 @@
 
 ## Installation
 
-Add below line to your application's Gemfile:
-```ruby
-gem 'letsencrypt_plugin'
-```
-And then execute:
-```bash
-$ bundle install
-```
-Or install it yourself as:
-```bash
-$ gem install letsencrypt_plugin
-```
+Install the letsencrypt_plugin gem, either via Bundler or Rubygems:
 
-After that you have to run two following commands to copy letsencrypt_plugin database migration to your application and create `Challenges` table: 
-```bash
-$ rake letsencrypt_plugin:install:migrations
-```
-```bash
-$ rake db:migration RAILS_ENV=production
-```
+* Via Bundler
 
-Next thing is to create configuration file (template below):
+  Add the following line to your application's Gemfile:
+  ```ruby
+  gem 'letsencrypt_plugin'
+  ```
+  And then execute:
+  ```bash
+  $ bundle install
+  ```
+
+* Via Rubygems
+
+  Execute:
+  ```bash
+  $ gem install letsencrypt_plugin
+  ```
+
+
+
+Create a configuration file `#{Rails.root}/config/letsencrypt_plugin.yml` (template below):
 ```yaml
 default: &default
   endpoint: "https://acme-v01.api.letsencrypt.org/"
@@ -42,16 +43,33 @@ development:
 test:
   <<: *default
 ```
-into `Rails.root/config/letsencrypt_plugin.yml` file. Both `private_key` and `output_cert_dir` must exist (they wont be created automaticaly).
 
-And the last thing which should be done is to mount `letsencrypt_plugin` engine in routes.rb:
 
+The plugin requires a SQL database to store temporary information.  Your app must already be configured to have access to a SQL db (e.g. Postgres, MySQL, or sqlite3).   The following commands will create a database table named `letsencrypt_plugin_challenges`:
+```bash
+$ rake letsencrypt_plugin:install:migrations
+$ rake db:migrate # or on production, $ rake db:migrate RAILS_ENV=production
+```
+
+
+Create some empty files within the Rails.root as placeholders:
+```bash
+$ mkdir key
+$ mkdir certificates
+$ touch key/.gitkeep
+$ touch certificates/.gitkeep
+```
+
+Create the file `key/keyfile.pem`:
+  ** HOW? **
+
+
+Enable letsencrypt_plugin to respond to to ACME requests.  Edit `config/routes.rb`:
 ```ruby
 Rails.application.routes.draw do
   mount LetsencryptPlugin::Engine, at: "/"  # It must be at root level
 
   # Other routes...
-
 end
 ```
 
